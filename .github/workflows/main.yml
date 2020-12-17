@@ -13,4 +13,4 @@ jobs:
       - name: test
         run: |
           sudo systemctl start mysql.service
-          mysql -uroot -v -e "CREATE DATABASE test;"
+          mysql -uroot -proot -v -e "CREATE DATABASE test;"
