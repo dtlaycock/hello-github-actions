@@ -1,5 +1,16 @@
 name: A workflow for my Hello World file
-on: push
+on: 
+  push:
+    branches: master
+  pull_request:
+    branches: master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'The environment you are deploying to'
+        required: true
+        options: ['DEV', 'STAGE', 'PROD']
+        default: 'DEV'
 
 jobs:
   build:
@@ -10,7 +21,10 @@ jobs:
       - uses: ./action-a
         with:
           MY_NAME: "Mona"
+  deploy:
+    name: Deploy job
+    runs-on: ubuntu-18.04
+    steps:
       - name: test
         run: |
-          sudo systemctl start mysql.service
-          mysql -uroot -proot -v -e "CREATE DATABASE test;"
+          echo "Deploying to: ${{ github.event.inputs.environment }}"
