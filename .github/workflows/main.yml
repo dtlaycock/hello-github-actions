@@ -27,6 +27,7 @@ jobs:
           MY_NAME: "Mona"
   deploy:
     name: Deploy job
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-18.04
     steps:
       - name: test
