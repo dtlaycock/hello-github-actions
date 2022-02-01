@@ -9,7 +9,11 @@ on:
       environment:
         description: 'The environment you are deploying to'
         required: true
-        options: ['DEV', 'STAGE', 'PROD']
+        type: choice
+        options: 
+          - 'DEV'
+          - 'STAGE'
+          - 'PROD'
         default: 'DEV'
 
 jobs:
