@@ -37,13 +37,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Push build data to Accelerate
-        run: |-
+        run: |
+          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           curl -k -X POST 'http://localhost/api/v1/builds/apiDriven' \
           -H 'Authorization: UserAccessKey ${{ secrets.ACCELERATE_KEY }}' \
           -H 'Content-Type: application/json' \
           -d '{
             "version": "${{ github.run_number }}"
-            "application":{"externalId": "b6010acd-0d4b-46c2-a59c-0659b7fc9d40"},
-            "url":"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            "application": {"externalId": "b6010acd-0d4b-46c2-a59c-0659b7fc9d40"},
+            "url": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             "revision": "${{ github.sha }}"
             }'
