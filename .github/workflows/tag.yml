@@ -1,0 +1,14 @@
+name: Integration with HCL Accelerate
+on:
+  push:
+    tag:
+      - '*'
+jobs:
+  send-version-to-accelerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tagged version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo ${VERSION}
+          
