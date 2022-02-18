@@ -4,17 +4,6 @@ on:
     branches: 
       - master
       - dev
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'The environment you are deploying to'
-        required: true
-        type: choice
-        options: 
-          - 'DEV'
-          - 'STAGE'
-          - 'PROD'
-        default: 'DEV'
 
 jobs:
   build:
@@ -40,6 +29,10 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           ENV=${GITHUB_REF#refs/heads/}
+          ENV="${ENV^^}"
+          if [ $ENV = "MASTER" ]; then
+            ENV="PROD"
+          fi
           JSON_STRING=$( jq -n \
                   --arg version "${VERSION}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
