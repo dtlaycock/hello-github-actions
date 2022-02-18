@@ -1,9 +1,9 @@
 name: A workflow for my Hello World file
 on: 
   push:
-    branches: master
-  pull_request:
-    branches: master
+    branches: 
+      - master
+      - dev
   workflow_dispatch:
     inputs:
       environment:
@@ -38,14 +38,13 @@ jobs:
     steps:
       - name: Push build data to Accelerate
         run: |
-          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          curl -k -X POST 'http://localhost/api/v1/builds/apiDriven' \
-          -H 'Authorization: UserAccessKey ${{ secrets.ACCELERATE_KEY }}' \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "version": "${{ github.run_number }}"
-            "application": {"externalId": "b6010acd-0d4b-46c2-a59c-0659b7fc9d40"},
-            "url": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-            "revision": "${{ github.sha }}"
-            }'
+          VERSION=${GITHUB_REF#refs/tags/}
+          ENV=${GITHUB_REF#refs/heads/}
+          JSON_STRING=$( jq -n \
+                  --arg version "${VERSION}" \
+                  --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
+                  --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+                  --arg env "${ENV}"
+                  '{version: $version, application: { externalId: $id }, url: $url, environment: {name: $env}}' )
+          echo $JSON_STRING
+          

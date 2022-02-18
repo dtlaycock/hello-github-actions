@@ -17,12 +17,4 @@ jobs:
                   --arg sha "${{ github.sha }}" \
                   '{version: $version, application: { externalId: $id }, url: $url, revision: $sha}' )
           echo $JSON_STRING
-          curl -k -X POST 'https://accelerate.pfizer.com/api/v1/builds/apiDriven' \
-          -H 'Authorization: UserAccessKey ${{ secrets.EDISON_ACCELERATE_ACCESS_KEY }}' \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "version": "${VERSION}"
-            "application":{"externalId": "b6010acd-0d4b-46c2-a59c-0659b7fc9d40"},
-            "url": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-            "revision": "${{ github.sha }}"
-            }'
+          
