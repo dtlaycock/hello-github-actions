@@ -7,8 +7,22 @@ jobs:
   send-version-to-accelerate:
     runs-on: ubuntu-latest
     steps:
-      - name: Get tagged version
-        run: |
+      - name: Push tagged version to Accelerate
+        run: |-
           VERSION=${GITHUB_REF#refs/tags/}
-          echo ${VERSION}
-          
+          JSON_STRING=$( jq -n \
+                  --arg version "${VERSION}" \
+                  --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
+                  --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+                  --arg sha "${{ github.sha }}" \
+                  '{version: $version, application: { externalId: $id }, url: $url, revision: $sha}' )
+          echo $JSON_STRING
+          curl -k -X POST 'https://accelerate.pfizer.com/api/v1/builds/apiDriven' \
+          -H 'Authorization: UserAccessKey ${{ secrets.EDISON_ACCELERATE_ACCESS_KEY }}' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "version": "${VERSION}"
+            "application":{"externalId": "b6010acd-0d4b-46c2-a59c-0659b7fc9d40"},
+            "url": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            "revision": "${{ github.sha }}"
+            }'
