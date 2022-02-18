@@ -15,6 +15,7 @@ jobs:
           fi
       - name: Send the new version to Accelerate
         if: ${{ steps.tag.outputs.VERSION }}
+        run: |
           JSON_STRING=$( jq -n \
                   --arg version "${{ steps.tag.outputs.VERSION }}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
