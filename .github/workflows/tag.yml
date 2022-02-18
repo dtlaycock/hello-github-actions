@@ -14,9 +14,9 @@ jobs:
             run: echo '::set-output name=VERSION::${GITHUB_REF#refs/tags/v}'
           fi
       - name: Send the new version to Accelerate
-        if: ${{ steps.tag.outputs.version }}
+        if: ${{ steps.tag.outputs.VERSION }}
           JSON_STRING=$( jq -n \
-                  --arg version "${{ steps.tag.outputs.version }}" \
+                  --arg version "${{ steps.tag.outputs.VERSION }}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
                   --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
                   --arg sha "${{ github.sha }}" \
