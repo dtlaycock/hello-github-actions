@@ -2,16 +2,21 @@ name: Integration with HCL Accelerate
 on:
   push:
     tag:
-      - '*'
+      - 'v*'
 jobs:
   send-version-to-accelerate:
     runs-on: ubuntu-latest
     steps:
-      - name: Push tagged version to Accelerate
+      - name: Check that tags contains a version number
+        id: tag
         run: |-
-          VERSION=${GITHUB_REF#refs/tags/}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            run: echo '::set-output name=VERSION::${GITHUB_REF#refs/tags/v}'
+          fi
+      - name: Send the new version to Accelerate
+        if: ${{ steps.tag.outputs.version }}
           JSON_STRING=$( jq -n \
-                  --arg version "${VERSION}" \
+                  --arg version "${{ steps.tag.outputs.version }}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
                   --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
                   --arg sha "${{ github.sha }}" \
