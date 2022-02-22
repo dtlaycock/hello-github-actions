@@ -25,10 +25,14 @@ jobs:
                   --arg sha "${{ github.sha }}" \
                   '{version: $version, application: { externalId: $id }, url: $url, revision: $sha}' )
           echo $JSON_STRING
+  send-deployment-to-accelerate:
+    runs-on: ubuntu-latest
+    needs: send-version-to-accelerate
+    steps:
       - name: Push deployment information to Accelerate
         run: |
           if [[ ${{github.ref_type}} == 'tag' ]]; then
-            VERSION=${{ steps.tag.outputs.VERSION }}
+            VERSION=${{github.ref_name}}
           fi
           ENV=${{github.event.base_ref}}
           ENV="${ENV^^}"
