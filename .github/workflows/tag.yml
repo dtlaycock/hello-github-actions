@@ -45,7 +45,7 @@ jobs:
           ENV: ${{ needs.get-details.outputs.env }}
         run: |
           JSON_STRING=$( jq -n \
-                  --arg version "$VERSION" \
+                  --arg version "${VERSION}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
                   --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
                   --arg sha "${{ github.sha }}" \
