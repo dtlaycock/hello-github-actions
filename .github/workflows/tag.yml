@@ -9,7 +9,7 @@ on:
       - 'v*'
       - '1.*'
 jobs:
-  get-details:
+  details:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.info.outputs.version }}
@@ -36,13 +36,13 @@ jobs:
           echo '::set-output name=env::$ENV'
   send-version-to-accelerate:
     runs-on: ubuntu-latest
-    needs: get-details
+    needs: details
     steps:
       - name: Push tagged version to Accelerate
         id: tag
         env:
-          VERSION: ${{ needs.get-details.outputs.version }}
-          ENV: ${{ needs.get-details.outputs.env }}
+          VERSION: ${{ needs.details.outputs.version }}
+          ENV: ${{ needs.details.outputs.env }}
         run: |
           JSON_STRING=$( jq -n \
                   --arg version "${VERSION}" \
@@ -53,10 +53,10 @@ jobs:
           echo $JSON_STRING
   send-deployment-to-accelerate:
     runs-on: ubuntu-latest
-    needs: [get-details, send-version-to-accelerate]
+    needs: [details, send-version-to-accelerate]
     env:
-      VERSION: ${{ needs.get-details.outputs.version }}
-      ENV: ${{ needs.get-details.outputs.env }}
+      VERSION: ${{ needs.details.outputs.version }}
+      ENV: ${{ needs.details.outputs.env }}
     steps:
       - name: Push deployment information to Accelerate
         run: |
@@ -69,8 +69,10 @@ jobs:
           echo $JSON_STRING
   debug:
     runs-on: ubuntu-latest
+    needs: details
     steps:
       - name: Debug output
         run: |
           echo '${{ toJSON(github) }}'
+          echo '${{ toJSON(needs) }}'
           
