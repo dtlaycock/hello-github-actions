@@ -1,16 +1,23 @@
 name: Tag workflow
 on:
   push:
+    branches: 
+      - master
+      - dev
+      - stage
     tag:
-      - '*'
+      - 'v*'
+      - '1.*'
 jobs:
   send-version-to-accelerate:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref_type == 'tag'
     steps:
       - name: Push tagged version to Accelerate
-        run: |-
-          VERSION=${GITHUB_REF#refs/tags/}
+        id: tag
+        run: |
+          VERSION=${{github.ref_name}}
+          echo '::set-output name=VERSION::$VERSION'
           JSON_STRING=$( jq -n \
                   --arg version "${VERSION}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
@@ -18,19 +25,22 @@ jobs:
                   --arg sha "${{ github.sha }}" \
                   '{version: $version, application: { externalId: $id }, url: $url, revision: $sha}' )
           echo $JSON_STRING
-  alternative-approach:
-    runs-on: ubuntu-latest
-    if: github.ref_type == 'tag'
-    steps:
-      - name: Push tagged version to Accelerate
-        run: |-
-          VERSION=${{github.ref_name}}
+      - name: Push deployment information to Accelerate
+        run: |
+          if [[ ${{github.ref_type}} == 'tag' ]]; then
+            VERSION=${{ steps.tag.outputs.VERSION }}
+          fi
+          ENV=${{github.event.base_ref}}
+          ENV="${ENV^^}"
+          if [ $ENV = "MASTER" ]; then
+            ENV="PROD"
+          fi
           JSON_STRING=$( jq -n \
                   --arg version "${VERSION}" \
                   --arg id "b6010acd-0d4b-46c2-a59c-0659b7fc9d40" \
                   --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-                  --arg sha "${{ github.sha }}" \
-                  '{version: $version, application: { externalId: $id }, url: $url, revision: $sha}' )
+                  --arg deploy_env "${ENV}" \
+                  '{version: $version, application: { externalId: $id }, url: $url, environment: {name: $deploy_env}}' )
           echo $JSON_STRING
   debug:
     runs-on: ubuntu-latest
