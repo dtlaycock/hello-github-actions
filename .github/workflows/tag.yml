@@ -33,8 +33,8 @@ jobs:
           if [ $ENV = "MASTER" ]; then
             ENV="PROD"
           fi
-          echo '::set-output name=version::$VERSION'
-          echo '::set-output name=env::$ENV'
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=env::$ENV"
   send-version-to-accelerate:
     runs-on: ubuntu-latest
     needs: details
