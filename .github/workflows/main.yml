@@ -27,7 +27,10 @@ jobs:
     steps:
       - name: Push build data to Accelerate
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          
           ENV=${GITHUB_REF#refs/heads/}
           ENV="${ENV^^}"
           if [ $ENV = "MASTER" ]; then
@@ -40,4 +43,9 @@ jobs:
                   --arg deploy_env "${ENV}" \
                   '{version: $version, application: { externalId: $id }, url: $url, environment: {name: $deploy_env}}' )
           echo $JSON_STRING
-          
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug output
+        run: |
+          echo '${{ toJSON(github) }}'
