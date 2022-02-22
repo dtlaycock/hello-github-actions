@@ -1,27 +1,12 @@
-name: A workflow for my Hello World file
+name: Deployment workflow
 on: 
   push:
     branches: 
       - master
       - dev
+      - stage
 
 jobs:
-  build:
-    name: Hello World action
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v1
-      - uses: ./action-a
-        with:
-          MY_NAME: "Mona"
-  deploy:
-    name: Deploy job
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-18.04
-    steps:
-      - name: test
-        run: |
-          echo "Deploying to: ${{ github.event.inputs.environment }}"
   send-to-accelerate:
     runs-on: ubuntu-latest
     steps:

@@ -1,4 +1,4 @@
-name: Integration with HCL Accelerate
+name: Tag workflow
 on:
   push:
     tag:
